@@ -12,5 +12,10 @@ class puppetmaster {
         creates => "/root/.ssh/id_rsa",
   }->
   exec {"/bin/chmod 600 /root/.ssh/id_rsa": }->
-  package {"git": ensure => installed, }
+  package {"git": ensure => installed, }->
+  exec {"/usr/bin/git clone git@github.com:aimansmith/puppetmodules":
+	cwd => "/opt/src",
+	require => File["/opt/src"],
+	creates => "/opt/src/puppetmodules",
+  }
 }
