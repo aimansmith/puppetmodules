@@ -1,0 +1,2 @@
+#!/bin/bash
+mysqldump -h <%= @demoapp_dbhost %> -u<%= @demoapp_dbuser %> -p'<%= @demoapp_dbpassword %>' <%= @demoapp_dbname %> | gzip > /tmp/<%= @demoapp_dbname %>-`date +%s`.sql.gz
