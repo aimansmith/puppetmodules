@@ -1,0 +1,23 @@
+#!/bin/bash
+
+exit 0
+# test the DB connectivity
+if echo "show tables" | mysql -h <%= @demoapp_dbserver %> <%= @demoapp_dbname %> &> /dev/null
+then
+  # We already have the DB.  we're good.
+  exit 0
+fi
+
+echo "CREATE DATABASE <%= @demoapp_dbname %>;
+GRANT ALL ON <%= @demoapp_dbname %>.* to '<%= @demoapp_dbuser %>'@'localhost' IDENTIFIED BY '<%= @demoapp_dbpassword %>'
+FLUSH PRIVILEGES" | mysql -h <%= @demoapp_dbserver %>
+
+# get the latest file
+latestBackup=`aws s3 ls <%= @demoapp_backuplocation %>/ | awk '{print $NF}' | tail -1`
+if ! echo "$latestBackup" | grep -i sql > /dev/null
+then
+  echo "Some problem with the backup file"
+  exit 1
+fi
+aws s3 cp <%= @demoapp_backuplocation %>/$latestBackup /tmp/
+mysql -h <%= @demoapp_dbserver %> <%= @demoapp_dbname %> < /tmp/$latestBackup
