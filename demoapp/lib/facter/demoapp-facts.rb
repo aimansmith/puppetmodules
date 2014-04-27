@@ -14,7 +14,7 @@ parsed["demoapp"].each do |key, value|
    if value.is_a? Array
     actual_value = value.join(',')
    end
-   Facter.add("demoapp" + key) do
+   Facter.add("demoapp_" + key) do
      setcode do
        actual_value
      end
