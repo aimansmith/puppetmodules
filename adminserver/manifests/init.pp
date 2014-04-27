@@ -6,4 +6,10 @@ class adminserver {
 	replace => yes,
 	ensure => present,
   }
+  # Back up the DB every hour on the hour
+  cron {"backup_demoappdb":
+	command => "/usr/local/bin/backup_demoapp_db.sh &> /dev/null",
+	user => root,
+	minute => "00",
+  }
 }
