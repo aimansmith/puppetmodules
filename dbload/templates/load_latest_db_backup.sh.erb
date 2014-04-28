@@ -1,6 +1,5 @@
 #!/bin/bash
 
-exit 0
 # test the DB connectivity
 if echo "show tables" | mysql -h <%= @demoapp_dbserver %> <%= @demoapp_dbname %> &> /dev/null
 then
