@@ -38,7 +38,9 @@ class demoapp {
 	  }
 	}
   }->
-
+  exec {"/usr/bin/git pull":
+	cwd => "/opt/src/thoughts",
+  }->
   # Install the app
   exec {"/opt/src/thoughts/install.sh": }->
   file {"/opt/src/thoughts.properties":
