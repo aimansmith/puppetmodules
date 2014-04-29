@@ -11,20 +11,20 @@ class demoapp {
   # Branch takes precendence
   case $demoapp_branch {
 	"master": {
-	  # This means we have no branch, look for a tag
+	  exec {"/usr/bin/git clone -b master https://github.com/aimansmith/thoughts":
+		cwd => "/opt/src",
+		creates => "/opt/src/thoughts",
+		require => File["/opt/src"],
+	  }
+	  # This means we have no branch, check out master and look for a tag
 	  case $demoapp_tag {
 	    "none": { 
-		exec {"/usr/bin/git clone -b master https://github.com/aimansmith/thoughts":
-		  cwd => "/opt/src",
-		  creates => "/opt/src/thoughts",
-		  require => File["/opt/src"],
-		}
+		notify {"No tag or branch to deploy, sticking with master": }
 	    }
-	    /(\d|\w)/: {
-		exec {"/usr/bin/git clone -b $demoapp_tag https://github.com/aimansmith/thoughts":
-		  cwd => "/opt/src",
-		  creates => "/opt/src/thoughts",
-		  require => File["/opt/src"],
+	    default: {
+		exec {"/usr/bin/git checkout tags/$demoapp_tag": 
+		  cwd => "/opt/src/thoughts",
+		  require => Exec["/usr/bin/git clone -b master https://github.com/aimansmith/thoughts"],
 		}
 	    }
 	  }
@@ -36,10 +36,11 @@ class demoapp {
 		creates => "/opt/src/thoughts",
 		require => File["/opt/src"],
 	  }
+	  exec {"/usr/bin/git pull":
+		cwd => "/opt/src/thoughts",
+		require => Exec["/usr/bin/git clone -b $demoapp_branch https://github.com/aimansmith/thoughts"],
+	  }
 	}
-  }->
-  exec {"/usr/bin/git pull":
-	cwd => "/opt/src/thoughts",
   }->
   # Install the app
   exec {"/opt/src/thoughts/install.sh": }->
